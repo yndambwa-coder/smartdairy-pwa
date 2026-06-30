@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>SmartDairy · Finance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+            padding-bottom: 80px;
+            min-height: 100vh;
+        }
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-icon {
+            background: #059669;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: white;
+            font-size: 20px;
+        }
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .logo-badge {
+            font-size: 10px;
+            background: #f3f4f6;
+            color: #6b7280;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 500;
+            margin-left: 4px;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f3f4f6;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .connection-status.online { color: #059669; }
+        .connection-status.offline { color: #ef4444; }
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: #d1fae5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #065f46;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+        .section-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            border: 1px solid #f3f4f6;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .section-card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .section-card-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .section-card-header h3 i {
+            color: #059669;
+            margin-right: 8px;
+        }
+        .form-container { padding: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+        .form-group label .required { color: #ef4444; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            background: white;
+        }
+        .form-group textarea { resize: vertical; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: #059669;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover { background: #047857; }
+        .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
+        .success-message, .error-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .success-message { background: #d1fae5; color: #065f46; }
+        .error-message { background: #fecaca; color: #991b1b; }
+        .success-message.show, .error-message.show { display: block; }
+        .table-container { overflow-x: auto; padding: 0 16px 16px 16px; }
+        .records-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .records-table thead th {
+            text-align: left;
+            padding: 12px 8px 8px 8px;
+            font-weight: 600;
+            color: #6b7280;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .records-table tbody td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #f9fafb;
+            color: #1f2937;
+        }
+        .records-table tbody tr:hover { background: #f9fafb; }
+        .loading-text {
+            text-align: center;
+            color: #9ca3af;
+            padding: 24px 0 !important;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 40;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 8px 16px;
+            text-decoration: none;
+            color: #9ca3af;
+            font-size: 10px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-item i { font-size: 20px; }
+        .nav-item:hover { color: #4b5563; }
+        .nav-item.active { color: #059669; }
+        .nav-item.active i { color: #059669; }
+        @media (max-width: 480px) {
+            .logo-text { font-size: 17px; }
+            .connection-status span { display: none; }
+            .nav-item { padding: 6px 10px; }
+            .nav-item span { font-size: 9px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-cow"></i></div>
+                <span class="logo-text">SmartDairy</span>
+                <span class="logo-badge">v2.0</span>
+            </div>
+            <div class="header-right">
+                <div class="connection-status" id="connectionStatus">
+                    <i class="fa-solid fa-wifi" id="statusIcon"></i>
+                    <span id="statusText">Online</span>
+                </div>
+                <div class="avatar">F</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="section-card">
+            <div class="section-card-header">
+                <h3><i class="fa-solid fa-coins"></i> Record Transaction</h3>
+            </div>
+            <div class="form-container">
+                <div id="successMessage" class="success-message"></div>
+                <div id="errorMessage" class="error-message"></div>
+
+                <form id="financeForm">
+                    <div class="form-group">
+                        <label for="txnType">Type <span class="required">*</span></label>
+                        <select id="txnType" required>
+                            <option value="">Select type</option>
+                            <option value="Income">Income</option>
+                            <option value="Expense">Expense</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category <span class="required">*</span></label>
+                        <input type="text" id="category" placeholder="e.g., Milk Sales, Feed, Vet" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount <span class="required">*</span></label>
+                        <input type="number" id="amount" placeholder="e.g., 150.00" step="0.01" min="0" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="txnDate">Date <span class="required">*</span></label>
+                        <input type="date" id="txnDate" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" rows="2" placeholder="Optional notes"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary" id="submitBtn">
+                        <i class="fa-solid fa-save"></i> Record Transaction
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-card-header">
+                <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Transactions</h3>
+            </div>
+            <div class="table-container">
+                <table class="records-table">
+                    <thead>
+                        <tr><th>Date</th><th>Type</th><th>Category</th><th>Amount</th></tr>
+                    </thead>
+                    <tbody id="transactionsBody">
+                        <tr><td colspan="4" class="loading-text">Loading transactions...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="add-animal.html" class="nav-item">
+            <i class="fa-solid fa-cow"></i>
+            <span>Herd</span>
+        </a>
+        <a href="record-milk.html" class="nav-item">
+            <i class="fa-solid fa-flask"></i>
+            <span>Milk</span>
+        </a>
+        <a href="inventory.html" class="nav-item">
+            <i class="fa-solid fa-warehouse"></i>
+            <span>Stock</span>
+        </a>
+        <a href="finance.html" class="nav-item active">
+            <i class="fa-solid fa-coins"></i>
+            <span>Finance</span>
+        </a>
+    </nav>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "firebase/app";
+        import { getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, addDoc, query, orderBy, limit, onSnapshot } from "firebase/firestore";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC0oO1sWOyV_9LNeI7-a-xROY96MkNU6k8",
+            authDomain: "smartdairy-81dd6.firebaseapp.com",
+            projectId: "smartdairy-81dd6",
+            storageBucket: "smartdairy-81dd6.firebasestorage.app",
+            messagingSenderId: "746224887364",
+            appId: "1:746224887364:web:f172dfda703fa5c6b5be11",
+            measurementId: "G-4CZELYQR2T"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = initializeFirestore(app, {
+            localCache: persistentLocalCache({
+                tabManager: persistentMultipleTabManager()
+            })
+        });
+
+        console.log("🔥 Firebase connected!");
+
+        const form = document.getElementById('financeForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMsg = document.getElementById('successMessage');
+        const errorMsg = document.getElementById('errorMessage');
+        const transactionsBody = document.getElementById('transactionsBody');
+        const txnDateInput = document.getElementById('txnDate');
+
+        txnDateInput.value = new Date().toISOString().split('T')[0];
+
+        const statusIcon = document.getElementById('statusIcon');
+        const statusText = document.getElementById('statusText');
+        const connectionStatus = document.getElementById('connectionStatus');
+
+        function updateConnectionStatus() {
+            if (navigator.onLine) {
+                statusIcon.className = 'fa-solid fa-wifi';
+                statusText.textContent = 'Online';
+                connectionStatus.className = 'connection-status online';
+            } else {
+                statusIcon.className = 'fa-solid fa-wifi';
+                statusText.textContent = 'Offline (Cached)';
+                connectionStatus.className = 'connection-status offline';
+            }
+        }
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+        updateConnectionStatus();
+
+        function listenTransactions() {
+            const q = query(collection(db, "transactions"), orderBy("transactionDate", "desc"), limit(10));
+            onSnapshot(q, (snap) => {
+                if (snap.empty) {
+                    transactionsBody.innerHTML = `<tr><td colspan="4" class="loading-text">No transactions yet.</td></tr>`;
+                    return;
+                }
+                let html = '';
+                snap.forEach(doc => {
+                    const t = doc.data();
+                    let date = t.transactionDate?.toDate?.() || new Date(t.transactionDate);
+                    const color = t.type === 'Income' ? '#059669' : '#dc2626';
+                    const sign = t.type === 'Income' ? '+' : '-';
+                    html += `<tr>
+                        <td>${date.toLocaleDateString()}</td>
+                        <td style="color:${color};font-weight:600;">${t.type}</td>
+                        <td>${t.category}</td>
+                        <td style="color:${color};font-weight:600;">${sign}$${t.amount.toFixed(2)}</td>
+                    </tr>`;
+                });
+                transactionsBody.innerHTML = html;
+            }, (err) => {
+                console.error('Transactions listen error:', err);
+                transactionsBody.innerHTML = `<tr><td colspan="4" class="loading-text">Error loading transactions.</td></tr>`;
+            });
+        }
+        listenTransactions();
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const type = document.getElementById('txnType').value;
+            const category = document.getElementById('category').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value);
+            const transactionDate = txnDateInput.value;
+            const description = document.getElementById('description').value.trim();
+
+            if (!type || !category || isNaN(amount) || amount < 0 || !transactionDate) {
+                errorMsg.textContent = 'Please fill all required fields.';
+                errorMsg.className = 'error-message show';
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+            errorMsg.className = 'error-message';
+            successMsg.className = 'success-message';
+
+            try {
+                await addDoc(collection(db, "transactions"), {
+                    type,
+                    category,
+                    amount,
+                    transactionDate: new Date(transactionDate),
+                    description: description || ''
+                });
+                successMsg.textContent = `✅ ${type} transaction recorded.`;
+                successMsg.className = 'success-message show';
+                form.reset();
+                txnDateInput.value = new Date().toISOString().split('T')[0];
+                setTimeout(() => successMsg.className = 'success-message', 3000);
+            } catch (err) {
+                console.error('Finance error:', err);
+                errorMsg.textContent = '❌ Failed to save transaction. Please try again.';
+                errorMsg.className = 'error-message show';
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fa-solid fa-save"></i> Record Transaction';
+        });
+
+        console.log('💰 Finance page ready.');
+    </script>
+</body>
+</html>

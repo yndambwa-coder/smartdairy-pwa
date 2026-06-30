@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>SmartDairy · Register</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .register-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            padding: 40px 32px;
+            max-width: 420px;
+            width: 100%;
+        }
+        .register-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .register-header .logo-icon {
+            background: #059669;
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            margin-bottom: 12px;
+        }
+        .register-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .register-header p {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            background: white;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: #059669;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover { background: #047857; }
+        .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
+        .error-message {
+            background: #fecaca;
+            color: #991b1b;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .error-message.show { display: block; }
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .success-message.show { display: block; }
+        .register-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .register-footer a {
+            color: #059669;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .register-footer a:hover { text-decoration: underline; }
+        .password-toggle {
+            position: relative;
+        }
+        .password-toggle input {
+            padding-right: 40px;
+        }
+        .password-toggle .toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .password-toggle .toggle-btn:hover { color: #1f2937; }
+        .password-requirements {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+        .password-requirements .valid { color: #059669; }
+        .password-requirements .invalid { color: #ef4444; }
+    </style>
+</head>
+<body>
+
+    <div class="register-container">
+        <div class="register-header">
+            <div class="logo-icon"><i class="fa-solid fa-cow"></i></div>
+            <h1>Create Account</h1>
+            <p>Start managing your dairy farm</p>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="farmer@smartdairy.com" required />
+            </div>
+            <div class="form-group password-toggle">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Min 6 characters" required />
+                <button type="button" class="toggle-btn" id="togglePassword">
+                    <i class="fa-regular fa-eye"></i>
+                </button>
+                <div class="password-requirements">
+                    <span id="lengthCheck">🔴 Must be at least 6 characters</span>
+                </div>
+            </div>
+            <div class="form-group password-toggle">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" placeholder="Re-enter your password" required />
+                <button type="button" class="toggle-btn" id="toggleConfirmPassword">
+                    <i class="fa-regular fa-eye"></i>
+                </button>
+            </div>
+            <button type="submit" class="btn-primary" id="registerBtn">
+                <i class="fa-solid fa-user-plus"></i> Create Account
+            </button>
+        </form>
+
+        <div class="register-footer">
+            Already have an account? <a href="login.html">Sign In</a>
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "firebase/app";
+        import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC0oO1sWOyV_9LNeI7-a-xROY96MkNU6k8",
+            authDomain: "smartdairy-81dd6.firebaseapp.com",
+            projectId: "smartdairy-81dd6",
+            storageBucket: "smartdairy-81dd6.firebasestorage.app",
+            messagingSenderId: "746224887364",
+            appId: "1:746224887364:web:f172dfda703fa5c6b5be11",
+            measurementId: "G-4CZELYQR2T"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const form = document.getElementById('registerForm');
+        const registerBtn = document.getElementById('registerBtn');
+        const errorMsg = document.getElementById('errorMessage');
+        const successMsg = document.getElementById('successMessage');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmInput = document.getElementById('confirmPassword');
+        const lengthCheck = document.getElementById('lengthCheck');
+
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', () => {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+        });
+        document.getElementById('toggleConfirmPassword').addEventListener('click', () => {
+            const type = confirmInput.type === 'password' ? 'text' : 'password';
+            confirmInput.type = type;
+        });
+
+        // Password strength check
+        passwordInput.addEventListener('input', () => {
+            if (passwordInput.value.length >= 6) {
+                lengthCheck.innerHTML = '✅ Must be at least 6 characters';
+                lengthCheck.className = 'valid';
+            } else {
+                lengthCheck.innerHTML = '🔴 Must be at least 6 characters';
+                lengthCheck.className = 'invalid';
+            }
+        });
+
+        // Check if user is already logged in
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            const confirm = confirmInput.value;
+
+            if (!email || !password || !confirm) {
+                errorMsg.textContent = 'Please fill in all fields.';
+                errorMsg.className = 'error-message show';
+                return;
+            }
+
+            if (password.length < 6) {
+                errorMsg.textContent = 'Password must be at least 6 characters.';
+                errorMsg.className = 'error-message show';
+                return;
+            }
+
+            if (password !== confirm) {
+                errorMsg.textContent = 'Passwords do not match.';
+                errorMsg.className = 'error-message show';
+                return;
+            }
+
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating account...';
+            errorMsg.className = 'error-message';
+            successMsg.className = 'success-message';
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                console.log('✅ User registered:', userCredential.user.email);
+                successMsg.textContent = '✅ Account created successfully! Redirecting...';
+                successMsg.className = 'success-message show';
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            } catch (err) {
+                console.error('Registration error:', err);
+                let message = '❌ Registration failed. Please try again.';
+                if (err.code === 'auth/email-already-in-use') {
+                    message = '❌ This email is already registered. Please sign in.';
+                } else if (err.code === 'auth/invalid-email') {
+                    message = '❌ Invalid email address. Please enter a valid email.';
+                } else if (err.code === 'auth/weak-password') {
+                    message = '❌ Password is too weak. Please use at least 6 characters.';
+                }
+                errorMsg.textContent = message;
+                errorMsg.className = 'error-message show';
+            }
+
+            registerBtn.disabled = false;
+            registerBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Account';
+        });
+
+        console.log('🔐 Registration page ready.');
+    </script>
+</body>
+</html>

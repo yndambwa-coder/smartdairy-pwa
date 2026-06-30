@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>SmartDairy · Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            padding: 40px 32px;
+            max-width: 420px;
+            width: 100%;
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .login-header .logo-icon {
+            background: #059669;
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            margin-bottom: 12px;
+        }
+        .login-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .login-header p {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            background: white;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: #059669;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover { background: #047857; }
+        .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
+        .error-message {
+            background: #fecaca;
+            color: #991b1b;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .error-message.show { display: block; }
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .success-message.show { display: block; }
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .login-footer a {
+            color: #059669;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .login-footer a:hover { text-decoration: underline; }
+        .password-toggle {
+            position: relative;
+        }
+        .password-toggle input {
+            padding-right: 40px;
+        }
+        .password-toggle .toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .password-toggle .toggle-btn:hover { color: #1f2937; }
+        /* Loading overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .loading-overlay.show {
+            display: flex;
+        }
+        .loading-overlay .spinner {
+            font-size: 40px;
+            color: #059669;
+            animation: spin 1s linear infinite;
+        }
+        .loading-overlay p {
+            margin-top: 12px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"><i class="fa-solid fa-spinner"></i></div>
+        <p>Checking your account...</p>
+    </div>
+
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo-icon"><i class="fa-solid fa-cow"></i></div>
+            <h1>SmartDairy</h1>
+            <p>Sign in to your account</p>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="your@email.com" required autocomplete="email" />
+            </div>
+            <div class="form-group password-toggle">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required autocomplete="current-password" />
+                <button type="button" class="toggle-btn" id="togglePassword">
+                    <i class="fa-regular fa-eye"></i>
+                </button>
+            </div>
+            <button type="submit" class="btn-primary" id="loginBtn">
+                <i class="fa-solid fa-right-to-bracket"></i> Sign In
+            </button>
+        </form>
+
+        <div class="login-footer">
+            Don't have an account? Contact your farm manager.
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "firebase/app";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+        import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC0oO1sWOyV_9LNeI7-a-xROY96MkNU6k8",
+            authDomain: "smartdairy-81dd6.firebaseapp.com",
+            projectId: "smartdairy-81dd6",
+            storageBucket: "smartdairy-81dd6.firebasestorage.app",
+            messagingSenderId: "746224887364",
+            appId: "1:746224887364:web:f172dfda703fa5c6b5be11",
+            measurementId: "G-4CZELYQR2T"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const form = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMsg = document.getElementById('errorMessage');
+        const successMsg = document.getElementById('successMessage');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        // ===== PREVENT REDIRECT LOOP =====
+        let isRedirecting = false;
+
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', () => {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+        });
+
+        // ===== AUTH STATE CHECK WITH FIX =====
+        onAuthStateChanged(auth, async (user) => {
+            // Prevent multiple redirects
+            if (isRedirecting) return;
+            
+            if (user) {
+                isRedirecting = true;
+                loadingOverlay.classList.add('show');
+                
+                try {
+                    // Check if user document exists
+                    let userDoc = await getDoc(doc(db, "users", user.uid));
+                    
+                    // If no user document, create one with default role
+                    if (!userDoc.exists()) {
+                        await setDoc(doc(db, "users", user.uid), {
+                            email: user.email,
+                            role: 'worker',
+                            createdAt: new Date().toISOString()
+                        });
+                        userDoc = await getDoc(doc(db, "users", user.uid));
+                    }
+                    
+                    const role = userDoc.exists() ? userDoc.data().role : 'worker';
+                    
+                    // Redirect based on role
+                    if (role === 'manager') {
+                        window.location.href = 'manager-dashboard.html';
+                    } else {
+                        window.location.href = 'worker-dashboard.html';
+                    }
+                    
+                } catch (err) {
+                    console.error('Error checking role:', err);
+                    // Fallback redirect
+                    window.location.href = 'worker-dashboard.html';
+                }
+            } else {
+                // User is not logged in - hide loading overlay
+                loadingOverlay.classList.remove('show');
+            }
+        });
+
+        // ===== LOGIN FORM SUBMIT =====
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!email || !password) {
+                errorMsg.textContent = 'Please enter both email and password.';
+                errorMsg.className = 'error-message show';
+                return;
+            }
+
+            // Show loading
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Signing in...';
+            errorMsg.className = 'error-message';
+            successMsg.className = 'success-message';
+            loadingOverlay.classList.add('show');
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Check user role
+                let userDoc = await getDoc(doc(db, "users", user.uid));
+                
+                // If no user document, create one
+                if (!userDoc.exists()) {
+                    await setDoc(doc(db, "users", user.uid), {
+                        email: user.email,
+                        role: 'worker',
+                        createdAt: new Date().toISOString()
+                    });
+                    userDoc = await getDoc(doc(db, "users", user.uid));
+                }
+                
+                const role = userDoc.exists() ? userDoc.data().role : 'worker';
+                console.log(`✅ Logged in as: ${email} (${role})`);
+
+                successMsg.textContent = `✅ Welcome ${role === 'manager' ? 'Manager' : 'Worker'}! Redirecting...`;
+                successMsg.className = 'success-message show';
+
+                // Redirect after short delay
+                setTimeout(() => {
+                    if (role === 'manager') {
+                        window.location.href = 'manager-dashboard.html';
+                    } else {
+                        window.location.href = 'worker-dashboard.html';
+                    }
+                }, 1000);
+
+            } catch (err) {
+                console.error('Login error:', err);
+                loadingOverlay.classList.remove('show');
+                
+                let message = '❌ Invalid email or password. Please try again.';
+                if (err.code === 'auth/user-not-found') {
+                    message = '❌ No account found with this email. Please contact your manager.';
+                } else if (err.code === 'auth/wrong-password') {
+                    message = '❌ Incorrect password. Please try again.';
+                } else if (err.code === 'auth/too-many-requests') {
+                    message = '❌ Too many failed attempts. Please try again later.';
+                } else if (err.code === 'auth/invalid-email') {
+                    message = '❌ Invalid email address. Please enter a valid email.';
+                }
+                errorMsg.textContent = message;
+                errorMsg.className = 'error-message show';
+
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
+            }
+        });
+
+        console.log('🔐 Login page ready.');
+    </script>
+</body>
+</html>

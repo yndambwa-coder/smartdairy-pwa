@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>SmartDairy · Worker Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+            padding-bottom: 80px;
+            min-height: 100vh;
+        }
+        .header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-icon {
+            background: #059669;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: white;
+            font-size: 20px;
+        }
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .logo-badge {
+            font-size: 10px;
+            background: #d1fae5;
+            color: #065f46;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f3f4f6;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .connection-status.online { color: #059669; }
+        .connection-status.offline { color: #ef4444; }
+        .user-email {
+            font-size: 12px;
+            color: #6b7280;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .logout-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover { background: #fecaca; }
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: #d1fae5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #065f46;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+        .h-20 { height: 80px; }
+        .section-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            border: 1px solid #f3f4f6;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .section-card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .section-card-header:hover {
+            background: #f9fafb;
+        }
+        .section-card-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .section-card-header h3 i {
+            color: #059669;
+            margin-right: 8px;
+        }
+        .section-card-header .badge {
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+        .form-container { padding: 20px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+        .form-group label .required { color: #ef4444; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            background: white;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: #059669;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover { background: #047857; }
+        .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
+        .btn-secondary {
+            padding: 10px 20px;
+            background: #1d4ed8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-secondary:hover { background: #1e40af; }
+        .btn-secondary:disabled { background: #9ca3af; cursor: not-allowed; }
+        .success-message, .error-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .success-message { background: #d1fae5; color: #065f46; }
+        .error-message { background: #fecaca; color: #991b1b; }
+        .success-message.show, .error-message.show { display: block; }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            z-index: 40;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 8px 16px;
+            text-decoration: none;
+            color: #9ca3af;
+            font-size: 10px;
+            font-weight: 500;
+            transition: color 0.2s;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+        .nav-item i { font-size: 20px; }
+        .nav-item:hover { color: #4b5563; }
+        .nav-item.active { color: #059669; }
+        .nav-item.active i { color: #059669; }
+        @media (max-width: 480px) {
+            .stat-value { font-size: 20px; }
+            .logo-text { font-size: 17px; }
+            .connection-status span { display: none; }
+            .nav-item { padding: 6px 10px; }
+            .nav-item span { font-size: 9px; }
+        }
+        .table-container {
+            overflow-x: auto;
+            padding: 0 16px 16px 16px;
+        }
+        .records-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .records-table thead th {
+            text-align: left;
+            padding: 12px 8px 8px 8px;
+            font-weight: 600;
+            color: #6b7280;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .records-table tbody td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #f9fafb;
+            color: #1f2937;
+        }
+        .records-table tbody tr:hover { background: #f9fafb; }
+        .status-badge {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+        .status-badge.synced { background: #d1fae5; color: #065f46; }
+        .status-badge.pending { background: #fef3c7; color: #92400e; }
+        .status-badge.alert { background: #fecaca; color: #991b1b; }
+        .status-badge.done { background: #d1fae5; color: #065f46; }
+        .loading-text {
+            text-align: center;
+            color: #9ca3af;
+            padding: 24px 0 !important;
+        }
+        .welcome-banner {
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+            padding: 24px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .welcome-banner h2 {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        .welcome-banner p {
+            margin-top: 4px;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .task-item:last-child { border-bottom: none; }
+        .task-item .task-check {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .task-item .task-check:hover { border-color: #059669; }
+        .task-item .task-check.done {
+            background: #059669;
+            border-color: #059669;
+            color: white;
+        }
+        .task-item .task-text { flex: 1; font-size: 14px; }
+        .task-item .task-text.done { text-decoration: line-through; color: #9ca3af; }
+        .task-item .task-priority {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        .task-item .task-priority.high { background: #fecaca; color: #991b1b; }
+        .task-item .task-priority.medium { background: #fef3c7; color: #92400e; }
+        .task-item .task-priority.low { background: #d1fae5; color: #065f46; }
+        .tab-container {
+            display: flex;
+            gap: 4px;
+            padding: 4px 4px 0 4px;
+            background: #f3f4f6;
+            border-radius: 8px 8px 0 0;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            border-radius: 6px 6px 0 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+        }
+        .tab-btn:hover { color: #1f2937; }
+        .tab-btn.active {
+            background: white;
+            color: #059669;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+        }
+        .tab-content {
+            display: none;
+            padding: 16px;
+            background: white;
+            border-radius: 0 0 12px 12px;
+        }
+        .tab-content.active { display: block; }
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.85);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .loading-overlay.show {
+            display: flex;
+        }
+        .loading-overlay .spinner {
+            font-size: 48px;
+            color: #059669;
+            animation: spin 1s linear infinite;
+        }
+        .loading-overlay p {
+            margin-top: 12px;
+            color: #6b7280;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .search-box {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: #059669;
+        }
+        .search-box button {
+            padding: 8px 16px;
+            background: #059669;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .search-box button:hover { background: #047857; }
+        .animal-card {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .animal-card:last-child { border-bottom: none; }
+        .animal-card .animal-info h4 { font-size: 14px; color: #1f2937; }
+        .animal-card .animal-info p { font-size: 12px; color: #6b7280; }
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 12px 16px;
+        }
+        .stat-row .stat-item {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-row .stat-item .number {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .stat-row .stat-item .label {
+            font-size: 11px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== LOADING OVERLAY ===== -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"><i class="fa-solid fa-spinner"></i></div>
+        <p>Loading your dashboard...</p>
+    </div>
+
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-cow"></i></div>
+                <span class="logo-text">SmartDairy</span>
+                <span class="logo-badge">Worker</span>
+            </div>
+            <div class="header-right">
+                <div class="connection-status" id="connectionStatus">
+                    <i class="fa-solid fa-wifi" id="statusIcon"></i>
+                    <span id="statusText">Online</span>
+                </div>
+                <span class="user-email" id="userEmail"></span>
+                <button class="logout-btn" onclick="logout()" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+                <div class="avatar">W</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <h2>👋 Welcome, <span id="workerName">Worker</span>!</h2>
+            <p>Complete your daily tasks and record farm activities here.</p>
+        </div>
+
+        <!-- ===== TASK LIST ===== -->
+        <div class="section-card">
+            <div class="section-card-header">
+                <h3><i class="fa-solid fa-list-check"></i> Today's Tasks</h3>
+                <span class="badge" id="taskCount">0</span>
+            </div>
+            <div id="taskListContainer">
+                <div class="task-item">
+                    <div class="task-check done" onclick="toggleTask(this)">
+                        <i class="fa-solid fa-check" style="font-size:12px;"></i>
+                    </div>
+                    <span class="task-text done">Morning milking completed</span>
+                    <span class="task-priority high">High</span>
+                </div>
+                <div class="task-item">
+                    <div class="task-check" onclick="toggleTask(this)"></div>
+                    <span class="task-text">Feed all cows - 08:00 AM</span>
+                    <span class="task-priority high">High</span>
+                </div>
+                <div class="task-item">
+                    <div class="task-check" onclick="toggleTask(this)"></div>
+                    <span class="task-text">Check health of COW-003 (off feed)</span>
+                    <span class="task-priority medium">Medium</span>
+                </div>
+                <div class="task-item">
+                    <div class="task-check" onclick="toggleTask(this)"></div>
+                    <span class="task-text">Clean milking parlor</span>
+                    <span class="task-priority low">Low</span>
+                </div>
+                <div class="task-item">
+                    <div class="task-check" onclick="toggleTask(this)"></div>
+                    <span class="task-text">Record evening milk yields</span>
+                    <span class="task-priority medium">Medium</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== TABS: Milk | Health | Breeding | Records ===== -->
+        <div class="section-card">
+            <div class="tab-container">
+                <button class="tab-btn active" onclick="switchTab('milk')">
+                    <i class="fa-solid fa-droplet"></i> Milk
+                </button>
+                <button class="tab-btn" onclick="switchTab('health')">
+                    <i class="fa-solid fa-heart-pulse"></i> Health
+                </button>
+                <button class="tab-btn" onclick="switchTab('breeding')">
+                    <i class="fa-solid fa-baby"></i> Breeding
+                </button>
+                <button class="tab-btn" onclick="switchTab('records')">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Records
+                </button>
+            </div>
+
+            <!-- ===== TAB 1: MILK ===== -->
+            <div class="tab-content active" id="tab-milk">
+                <form id="milkForm">
+                    <div id="milkSuccess" class="success-message"></div>
+                    <div id="milkError" class="error-message"></div>
+
+                    <div class="form-group">
+                        <label for="animalSelect">Select Cow <span class="required">*</span></label>
+                        <select id="animalSelect" required>
+                            <option value="">Loading cows...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="milkYield">Milk Yield (litres) <span class="required">*</span></label>
+                        <input type="number" id="milkYield" placeholder="e.g., 18.5" step="0.1" min="0" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="recordDate">Date <span class="required">*</span></label>
+                        <input type="date" id="recordDate" required />
+                    </div>
+                    <button type="submit" class="btn-primary" id="milkBtn">
+                        <i class="fa-solid fa-save"></i> Record Milk
+                    </button>
+                </form>
+            </div>
+
+            <!-- ===== TAB 2: HEALTH ===== -->
+            <div class="tab-content" id="tab-health">
+                <form id="healthForm">
+                    <div id="healthSuccess" class="success-message"></div>
+                    <div id="healthError" class="error-message"></div>
+
+                    <div class="form-group">
+                        <label for="healthAnimalSelect">Cow <span class="required">*</span></label>
+                        <select id="healthAnimalSelect" required>
+                            <option value="">Loading cows...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="healthIssue">Health Issue <span class="required">*</span></label>
+                        <select id="healthIssue" required>
+                            <option value="">Select issue</option>
+                            <option value="Mastitis">Mastitis</option>
+                            <option value="Lameness">Lameness</option>
+                            <option value="Fever">Fever</option>
+                            <option value="Off Feed">Off Feed</option>
+                            <option value="Injury">Injury</option>
+                            <option value="Calving Difficulty">Calving Difficulty</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="healthSeverity">Severity</label>
+                        <select id="healthSeverity">
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="healthTreatment">Treatment Given</label>
+                        <textarea id="healthTreatment" rows="2" placeholder="Describe treatment administered..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="healthDate">Date <span class="required">*</span></label>
+                        <input type="date" id="healthDate" required />
+                    </div>
+                    <button type="submit" class="btn-primary" id="healthBtn">
+                        <i class="fa-solid fa-heart-pulse"></i> Log Health Record
+                    </button>
+                </form>
+            </div>
+
+            <!-- ===== TAB 3: BREEDING ===== -->
+            <div class="tab-content" id="tab-breeding">
+                <form id="breedingForm">
+                    <div id="breedingSuccess" class="success-message"></div>
+                    <div id="breedingError" class="error-message"></div>
+
+                    <div class="form-group">
+                        <label for="breedingAnimalSelect">Cow <span class="required">*</span></label>
+                        <select id="breedingAnimalSelect" required>
+                            <option value="">Loading cows...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="breedingEvent">Event <span class="required">*</span></label>
+                        <select id="breedingEvent" required>
+                            <option value="">Select event</option>
+                            <option value="Heat Detected">Heat Detected</option>
+                            <option value="Insemination">Insemination</option>
+                            <option value="Pregnancy Check">Pregnancy Check</option>
+                            <option value="Calving">Calving</option>
+                            <option value="Abortion">Abortion</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="breedingNotes">Notes</label>
+                        <textarea id="breedingNotes" rows="2" placeholder="Additional details..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="breedingDate">Date <span class="required">*</span></label>
+                        <input type="date" id="breedingDate" required />
+                    </div>
+                    <button type="submit" class="btn-primary" id="breedingBtn">
+                        <i class="fa-solid fa-baby"></i> Log Breeding Record
+                    </button>
+                </form>
+            </div>
+
+            <!-- ===== TAB 4: RECORDS ===== -->
+            <div class="tab-content" id="tab-records">
+                <div class="search-box">
+                    <input type="text" id="recordSearch" placeholder="Search cows... (e.g., COW-001)" />
+                    <button onclick="searchRecords()"><i class="fa-solid fa-search"></i></button>
+                </div>
+                <div id="recordResults">
+                    <div class="animal-card">
+                        <div class="animal-info">
+                            <h4>COW-001</h4>
+                            <p>Holstein · Female · Active</p>
+                            <p style="font-size:11px;color:#6b7280;margin-top:4px;">
+                                <i class="fa-solid fa-droplet"></i> Today: 18.5 L · 
+                                <i class="fa-solid fa-heart-pulse"></i> Last check: 2 days ago
+                            </p>
+                        </div>
+                        <button onclick="viewAnimal('COW-001')" style="background:none;border:none;color:#059669;cursor:pointer;">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="animal-card">
+                        <div class="animal-info">
+                            <h4>COW-002</h4>
+                            <p>Jersey · Female · Active</p>
+                            <p style="font-size:11px;color:#6b7280;margin-top:4px;">
+                                <i class="fa-solid fa-droplet"></i> Today: 15.7 L · 
+                                <i class="fa-solid fa-heart-pulse"></i> Last check: Today
+                            </p>
+                        </div>
+                        <button onclick="viewAnimal('COW-002')" style="background:none;border:none;color:#059669;cursor:pointer;">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="animal-card">
+                        <div class="animal-info">
+                            <h4>COW-003</h4>
+                            <p>Holstein · Female · Active</p>
+                            <p style="font-size:11px;color:#6b7280;margin-top:4px;">
+                                <i class="fa-solid fa-droplet"></i> Today: 22.0 L · 
+                                <i class="fa-solid fa-heart-pulse"></i> ⚠️ Needs attention
+                            </p>
+                        </div>
+                        <button onclick="viewAnimal('COW-003')" style="background:none;border:none;color:#059669;cursor:pointer;">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== MY PERFORMANCE ===== -->
+        <div class="section-card">
+            <div class="section-card-header">
+                <h3><i class="fa-solid fa-chart-simple"></i> My Performance</h3>
+            </div>
+            <div class="stat-row">
+                <div class="stat-item">
+                    <div class="number" id="myMilkTotal">0</div>
+                    <div class="label">Total Milk (L)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="myTasksDone">0</div>
+                    <div class="label">Tasks Completed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="myHealthRecords">0</div>
+                    <div class="label">Health Logs</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="myBreedingRecords">0</div>
+                    <div class="label">Breeding Logs</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ===== BOTTOM NAVIGATION ===== -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="scrollToTop()">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Dashboard</span>
+        </button>
+        <button class="nav-item" onclick="scrollToSection('taskListContainer')">
+            <i class="fa-solid fa-list-check"></i>
+            <span>Tasks</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('milk')">
+            <i class="fa-solid fa-droplet"></i>
+            <span>Milk</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('health')">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <span>Health</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('records')">
+            <i class="fa-solid fa-search"></i>
+            <span>Search</span>
+        </button>
+    </nav>
+
+    <!-- ===== FIREBASE IMPORTS & SCRIPT ===== -->
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js",
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "firebase/app";
+        import { getFirestore, collection, getDocs, query, orderBy, limit, onSnapshot, addDoc, doc, getDoc, setDoc, where } from "firebase/firestore";
+        import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC0oO1sWOyV_9LNeI7-a-xROY96MkNU6k8",
+            authDomain: "smartdairy-81dd6.firebaseapp.com",
+            projectId: "smartdairy-81dd6",
+            storageBucket: "smartdairy-81dd6.firebasestorage.app",
+            messagingSenderId: "746224887364",
+            appId: "1:746224887364:web:f172dfda703fa5c6b5be11",
+            measurementId: "G-4CZELYQR2T"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // ===== PREVENT REDIRECT LOOP =====
+        let isRedirecting = false;
+        let currentUserData = null;
+        let allCows = [];
+
+        const userEmailEl = document.getElementById('userEmail');
+        const workerNameEl = document.getElementById('workerName');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        // ===== AUTH STATE CHECK =====
+        onAuthStateChanged(auth, async (user) => {
+            if (isRedirecting) return;
+
+            if (!user) {
+                isRedirecting = true;
+                window.location.href = 'login.html';
+                return;
+            }
+
+            loadingOverlay.classList.add('show');
+
+            try {
+                let userDoc = await getDoc(doc(db, "users", user.uid));
+
+                if (!userDoc.exists()) {
+                    await setDoc(doc(db, "users", user.uid), {
+                        email: user.email,
+                        role: 'worker',
+                        createdAt: new Date().toISOString()
+                    });
+                    userDoc = await getDoc(doc(db, "users", user.uid));
+                }
+
+                const data = userDoc.data();
+                const role = data ? data.role : 'worker';
+
+                loadingOverlay.classList.remove('show');
+
+                if (role === 'manager') {
+                    isRedirecting = true;
+                    window.location.href = 'manager-dashboard.html';
+                    return;
+                }
+
+                currentUserData = data;
+                userEmailEl.textContent = user.email;
+                workerNameEl.textContent = data.name || 'Worker';
+                console.log('✅ Worker logged in:', user.email);
+
+                // Load all data
+                loadCows();
+                loadTodayMilk();
+                loadMyPerformance();
+
+            } catch (err) {
+                console.error('Role check error:', err);
+                loadingOverlay.classList.remove('show');
+                setTimeout(() => {
+                    if (!isRedirecting) {
+                        isRedirecting = true;
+                        window.location.href = 'login.html';
+                    }
+                }, 2000);
+            }
+        });
+
+        // ===== LOGOUT =====
+        window.logout = async function() {
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (err) {
+                console.error('Logout error:', err);
+                alert('Failed to logout. Please try again.');
+            }
+        };
+
+        // ===== TASK FUNCTIONS =====
+        window.toggleTask = function(el) {
+            const taskText = el.parentElement.querySelector('.task-text');
+            const taskItem = el.parentElement;
+            if (el.classList.contains('done')) {
+                el.classList.remove('done');
+                el.innerHTML = '';
+                taskText.classList.remove('done');
+                taskItem.style.opacity = '1';
+            } else {
+                el.classList.add('done');
+                el.innerHTML = '<i class="fa-solid fa-check" style="font-size:12px;"></i>';
+                taskText.classList.add('done');
+                taskItem.style.opacity = '0.7';
+            }
+            updateTaskCount();
+        };
+
+        function updateTaskCount() {
+            const total = document.querySelectorAll('.task-item').length;
+            const done = document.querySelectorAll('.task-item .task-check.done').length;
+            document.getElementById('taskCount').textContent = `${done}/${total}`;
+        }
+        updateTaskCount();
+
+        // ===== TAB FUNCTIONS =====
+        window.switchTab = function(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.tab-btn[onclick*="${tabName}"]`).classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            // Update nav items (mobile bottom nav)
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        };
+
+        // ===== SCROLL FUNCTIONS =====
+        window.scrollToTop = function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelector('.bottom-nav .nav-item:first-child').classList.add('active');
+        };
+
+        window.scrollToSection = function(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(item => item.classList.remove('active'));
+        };
+
+        // ===== CONNECTION STATUS =====
+        const statusIcon = document.getElementById('statusIcon');
+        const statusText = document.getElementById('statusText');
+        const connectionStatus = document.getElementById('connectionStatus');
+
+        function updateConnectionStatus() {
+            if (navigator.onLine) {
+                statusIcon.className = 'fa-solid fa-wifi';
+                statusText.textContent = 'Online';
+                connectionStatus.className = 'connection-status online';
+            } else {
+                statusIcon.className = 'fa-solid fa-wifi';
+                statusText.textContent = 'Offline (Cached)';
+                connectionStatus.className = 'connection-status offline';
+            }
+        }
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+        updateConnectionStatus();
+
+        // ===== LOAD COWS =====
+        async function loadCows() {
+            try {
+                const snap = await getDocs(collection(db, "animals"));
+                allCows = [];
+                snap.forEach(doc => {
+                    allCows.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Update all dropdowns
+                const selects = ['animalSelect', 'healthAnimalSelect', 'breedingAnimalSelect'];
+                selects.forEach(selectId => {
+                    const select = document.getElementById(selectId);
+                    if (!select) return;
+                    if (allCows.length === 0) {
+                        select.innerHTML = '<option value="">No cows found. Ask manager to add some!</option>';
+                        return;
+                    }
+                    let opts = '<option value="">Select a cow</option>';
+                    allCows.forEach(cow => {
+                        opts += `<option value="${cow.animalId}">${cow.animalId} - ${cow.breed}</option>`;
+                    });
+                    select.innerHTML = opts;
+                });
+            } catch (err) {
+                console.error('Load cows error:', err);
+            }
+        }
+
+        // ===== RECORD MILK =====
+        const milkForm = document.getElementById('milkForm');
+        const milkBtn = document.getElementById('milkBtn');
+        const milkSuccess = document.getElementById('milkSuccess');
+        const milkError = document.getElementById('milkError');
+        const recordDateInput = document.getElementById('recordDate');
+        recordDateInput.value = new Date().toISOString().split('T')[0];
+
+        milkForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const animalId = document.getElementById('animalSelect').value;
+            const milkYield = parseFloat(document.getElementById('milkYield').value);
+            const recordDate = recordDateInput.value;
+
+            if (!animalId || isNaN(milkYield) || milkYield < 0 || !recordDate) {
+                milkError.textContent = 'Please fill all fields correctly.';
+                milkError.className = 'error-message show';
+                return;
+            }
+
+            milkBtn.disabled = true;
+            milkBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+            milkError.className = 'error-message';
+            milkSuccess.className = 'success-message';
+
+            try {
+                await addDoc(collection(db, "milkRecords"), {
+                    animalId,
+                    milkYield,
+                    recordDate: new Date(recordDate),
+                    recordedBy: currentUserData?.email || 'Worker',
+                    recordedByName: currentUserData?.name || 'Worker'
+                });
+                milkSuccess.textContent = `✅ Milk record for ${animalId} saved!`;
+                milkSuccess.className = 'success-message show';
+                milkForm.reset();
+                recordDateInput.value = new Date().toISOString().split('T')[0];
+                loadCows();
+                loadTodayMilk();
+                loadMyPerformance();
+                setTimeout(() => milkSuccess.className = 'success-message', 3000);
+            } catch (err) {
+                console.error('Milk record error:', err);
+                milkError.textContent = '❌ Failed to save milk record. Please try again.';
+                milkError.className = 'error-message show';
+            }
+
+            milkBtn.disabled = false;
+            milkBtn.innerHTML = '<i class="fa-solid fa-save"></i> Record Milk';
+        });
+
+        // ===== RECORD HEALTH =====
+        const healthForm = document.getElementById('healthForm');
+        const healthBtn = document.getElementById('healthBtn');
+        const healthSuccess = document.getElementById('healthSuccess');
+        const healthError = document.getElementById('healthError');
+        document.getElementById('healthDate').value = new Date().toISOString().split('T')[0];
+
+        healthForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const animalId = document.getElementById('healthAnimalSelect').value;
+            const issue = document.getElementById('healthIssue').value;
+            const severity = document.getElementById('healthSeverity').value;
+            const treatment = document.getElementById('healthTreatment').value;
+            const healthDate = document.getElementById('healthDate').value;
+
+            if (!animalId || !issue || !healthDate) {
+                healthError.textContent = 'Please fill all required fields.';
+                healthError.className = 'error-message show';
+                return;
+            }
+
+            healthBtn.disabled = true;
+            healthBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+            healthError.className = 'error-message';
+            healthSuccess.className = 'success-message';
+
+            try {
+                await addDoc(collection(db, "healthRecords"), {
+                    animalId,
+                    issue,
+                    severity,
+                    treatment: treatment || '',
+                    healthDate: new Date(healthDate),
+                    recordedBy: currentUserData?.email || 'Worker',
+                    recordedByName: currentUserData?.name || 'Worker'
+                });
+                healthSuccess.textContent = `✅ Health record for ${animalId} saved!`;
+                healthSuccess.className = 'success-message show';
+                healthForm.reset();
+                document.getElementById('healthDate').value = new Date().toISOString().split('T')[0];
+                loadMyPerformance();
+                setTimeout(() => healthSuccess.className = 'success-message', 3000);
+            } catch (err) {
+                console.error('Health record error:', err);
+                healthError.textContent = '❌ Failed to save health record.';
+                healthError.className = 'error-message show';
+            }
+
+            healthBtn.disabled = false;
+            healthBtn.innerHTML = '<i class="fa-solid fa-heart-pulse"></i> Log Health Record';
+        });
+
+        // ===== RECORD BREEDING =====
+        const breedingForm = document.getElementById('breedingForm');
+        const breedingBtn = document.getElementById('breedingBtn');
+        const breedingSuccess = document.getElementById('breedingSuccess');
+        const breedingError = document.getElementById('breedingError');
+        document.getElementById('breedingDate').value = new Date().toISOString().split('T')[0];
+
+        breedingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const animalId = document.getElementById('breedingAnimalSelect').value;
+            const event = document.getElementById('breedingEvent').value;
+            const notes = document.getElementById('breedingNotes').value;
+            const breedingDate = document.getElementById('breedingDate').value;
+
+            if (!animalId || !event || !breedingDate) {
+                breedingError.textContent = 'Please fill all required fields.';
+                breedingError.className = 'error-message show';
+                return;
+            }
+
+            breedingBtn.disabled = true;
+            breedingBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+            breedingError.className = 'error-message';
+            breedingSuccess.className = 'success-message';
+
+            try {
+                await addDoc(collection(db, "breedingRecords"), {
+                    animalId,
+                    event,
+                    notes: notes || '',
+                    breedingDate: new Date(breedingDate),
+                    recordedBy: currentUserData?.email || 'Worker',
+                    recordedByName: currentUserData?.name || 'Worker'
+                });
+                breedingSuccess.textContent = `✅ Breeding record for ${animalId} saved!`;
+                breedingSuccess.className = 'success-message show';
+                breedingForm.reset();
+                document.getElementById('breedingDate').value = new Date().toISOString().split('T')[0];
+                loadMyPerformance();
+                setTimeout(() => breedingSuccess.className = 'success-message', 3000);
+            } catch (err) {
+                console.error('Breeding record error:', err);
+                breedingError.textContent = '❌ Failed to save breeding record.';
+                breedingError.className = 'error-message show';
+            }
+
+            breedingBtn.disabled = false;
+            breedingBtn.innerHTML = '<i class="fa-solid fa-baby"></i> Log Breeding Record';
+        });
+
+        // ===== TODAY'S MILK RECORDS =====
+        const todayMilkBody = document.getElementById('todayMilkBody');
+
+        function loadTodayMilk() {
+            const q = query(collection(db, "milkRecords"), orderBy("recordDate", "desc"), limit(10));
+            onSnapshot(q, (snap) => {
+                if (snap.empty) {
+                    todayMilkBody.innerHTML = `<tr><td colspan="4" class="loading-text">No records yet today.</td></tr>`;
+                    return;
+                }
+                let html = '';
+                const today = new Date().toDateString();
+                let hasToday = false;
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    let date = d.recordDate?.toDate?.() || new Date(d.recordDate);
+                    if (date.toDateString() === today) {
+                        hasToday = true;
+                        html += `<tr>
+                            <td><strong>${d.animalId || 'N/A'}</strong></td>
+                            <td>${d.milkYield || 0} L</td>
+                            <td>${date.toLocaleDateString()}</td>
+                            <td><span class="status-badge synced"><i class="fa-regular fa-circle-check"></i> Synced</span></td>
+                        </tr>`;
+                    }
+                });
+                todayMilkBody.innerHTML = hasToday ? html : `<tr><td colspan="4" class="loading-text">No records yet today.</td></tr>`;
+            }, (err) => {
+                console.error('Milk listen error:', err);
+                todayMilkBody.innerHTML = `<tr><td colspan="4" class="loading-text">Error loading records.</td></tr>`;
+            });
+        }
+
+        // ===== MY PERFORMANCE =====
+        async function loadMyPerformance() {
+            try {
+                const milkSnap = await getDocs(collection(db, "milkRecords"));
+                let totalMilk = 0;
+                milkSnap.forEach(doc => {
+                    totalMilk += doc.data().milkYield || 0;
+                });
+                document.getElementById('myMilkTotal').textContent = totalMilk.toFixed(1);
+
+                // Task count (from the task list)
+                const doneTasks = document.querySelectorAll('.task-item .task-check.done').length;
+                document.getElementById('myTasksDone').textContent = doneTasks;
+
+                // Health records count
+                const healthSnap = await getDocs(collection(db, "healthRecords"));
+                document.getElementById('myHealthRecords').textContent = healthSnap.size;
+
+                // Breeding records count
+                const breedingSnap = await getDocs(collection(db, "breedingRecords"));
+                document.getElementById('myBreedingRecords').textContent = breedingSnap.size;
+
+            } catch (err) {
+                console.error('Performance load error:', err);
+            }
+        }
+
+        // ===== SEARCH RECORDS =====
+        window.searchRecords = function() {
+            const query = document.getElementById('recordSearch').value.toLowerCase();
+            const results = document.getElementById('recordResults');
+
+            if (!query) {
+                // Show all cows
+                let html = '';
+                allCows.forEach(cow => {
+                    html += `
+                        <div class="animal-card">
+                            <div class="animal-info">
+                                <h4>${cow.animalId}</h4>
+                                <p>${cow.breed} · ${cow.gender} · ${cow.status}</p>
+                            </div>
+                            <button onclick="viewAnimal('${cow.animalId}')" style="background:none;border:none;color:#059669;cursor:pointer;">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+                results.innerHTML = html || '<div class="loading-text">No cows found.</div>';
+                return;
+            }
+
+            const filtered = allCows.filter(cow =>
+                cow.animalId.toLowerCase().includes(query) ||
+                (cow.breed && cow.breed.toLowerCase().includes(query))
+            );
+
+            if (filtered.length === 0) {
+                results.innerHTML = `<div class="loading-text">No cows found matching "${query}".</div>`;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(cow => {
+                html += `
+                    <div class="animal-card">
+                        <div class="animal-info">
+                            <h4>${cow.animalId}</h4>
+                            <p>${cow.breed} · ${cow.gender} · ${cow.status}</p>
+                        </div>
+                        <button onclick="viewAnimal('${cow.animalId}')" style="background:none;border:none;color:#059669;cursor:pointer;">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            results.innerHTML = html;
+        };
+
+        // ===== VIEW ANIMAL =====
+        window.viewAnimal = function(animalId) {
+            alert(`🔍 Viewing details for ${animalId}\n\nFull animal profile with milk records, health history, and breeding records will appear here.`);
+        };
+
+        console.log('✅ Worker Dashboard script loaded.');
+    </script>
+</body>
+</html>
